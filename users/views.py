@@ -1,9 +1,15 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
-from django.contrib.auth.forms import UserCreationForm
+from .forms import CustomUserCreationForm
 
 from .models import Profile
 
+
+
+def userAccount(request):
+    profile = request.user.profile
+    context = {'profile': profile}
+    return render(request, 'users/account.html', context)
 
 
 def userProfile(request, username):
@@ -44,10 +50,10 @@ def registerUser(request):
         return redirect('products')
 
 
-    form = UserCreationForm()
+    form = CustomUserCreationForm()
 
     if request.method == 'POST':
-        form = UserCreationForm(request.POST)
+        form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
             user = form.save(commit=False)
