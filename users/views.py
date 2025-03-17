@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
+from django.contrib.auth.forms import UserCreationForm
 
 from .models import Profile
 
@@ -7,7 +8,8 @@ from .models import Profile
 
 def userProfile(request, username):
     profile =  Profile.objects.get(username=username)
-    context = {'profile': profile}
+    products = profile.product_set.all()
+    context = {'profile': profile, 'products': products}
     return render(request, 'users/profile.html', context)
 
 
@@ -34,6 +36,30 @@ def loginUser(request):
             print("USername OR password is incorrect")
 
     return render(request, 'users/login.html')
+
+
+def registerUser(request):
+
+    if request.user.is_authenticated:
+        return redirect('products')
+
+
+    form = UserCreationForm()
+
+    if request.method == 'POST':
+        form = UserCreationForm(request.POST)
+        if form.is_valid():
+            form.save()
+            user = form.save(commit=False)
+            user.username = user.username.lower()
+            user.save()
+
+            login(request, user)
+            return redirect('products')
+
+
+    context = {'form': form}
+    return render(request, 'users/register.html', context)
 
 
 def logoutUser(request):

@@ -12,6 +12,11 @@
     <span>{{tag.name}}</span>
     {% endfor %}
   </div>
+  {% if request.user.username == product.owner.username %}
+  <a href="{% url 'update-product' product.id %}">
+    <button>Edit Product</button>
+  </a>
+  {% endif %}
 </div>
 
 {% endblock content %}
