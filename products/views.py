@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from .models import Product
 from .forms import ProductForm
 
@@ -13,12 +14,16 @@ def product(request, pk):
     return render(request, 'products/product.html', context)
 
 
+@login_required(login_url="login")
 def createProduct(request):
     form = ProductForm()
+    profile = request.user.profile
 
     if request.method == 'POST':
-        product = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.user)
         if product.is_valid():
+            product = form.save(commit=False)
+            product.owner = profile
             product.save()
             return redirect('products')
 
@@ -26,6 +31,7 @@ def createProduct(request):
     return render(request, 'products/product_form.html', context)
 
 
+@login_required(login_url="login")
 def updateProduct(request, pk):
     product = Product.objects.get(id=pk)
     form = ProductForm(instance=product)
@@ -40,6 +46,7 @@ def updateProduct(request, pk):
     return render(request, 'products/product_form.html', context)
 
 
+@login_required(login_url="login")
 def deleteProduct(request, pk):
     product = Product.objects.get(id=pk)
 

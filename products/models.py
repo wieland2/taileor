@@ -1,8 +1,10 @@
 from django.db import models
+from users.models import Profile
 import uuid
 
 
 class Product(models.Model):
+    owner = models.ForeignKey(Profile, null=True, blank=True, on_delete=models.SET_NULL)
     title = models.CharField(max_length=150)
     price = models.FloatField(default=0.00)
     description = models.TextField(max_length=800, null=True, blank=True)
