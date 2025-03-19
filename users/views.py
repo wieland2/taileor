@@ -1,15 +1,23 @@
 from django.shortcuts import render, redirect
 from django.contrib.auth import login, logout, authenticate
 from .forms import CustomUserCreationForm
+from .forms import ProfileForm
 
 from .models import Profile
 
 
 
-def userAccount(request):
+def userSettings(request):
     profile = request.user.profile
-    context = {'profile': profile}
-    return render(request, 'users/account.html', context)
+    form = ProfileForm(instance=profile)
+    if request.method == 'POST':
+        form = ProfileForm(request.POST, instance=profile)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', request.user.profile)
+        
+    context = {'form': form }
+    return render(request, 'users/settings.html', context)
 
 
 def userProfile(request, username):
